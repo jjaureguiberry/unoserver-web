@@ -9,7 +9,7 @@ import { unoserver } from './unoserver.js'
 export async function convertFile(
 	srcPath: string,
 	format: string,
-): Promise<{ targetPath: string }> {
+): Promise<{ success: boolean, targetPath: string }> {
 	const ext = path.extname(srcPath).toLowerCase()
 	assert(
 		ext !== '',
@@ -24,7 +24,7 @@ export async function convertFile(
 
 	const targetPath = `${pathWithoutExtension}.${format}`
 
-	await unoserver.convert(srcPath, targetPath)
+	const success = await unoserver.convert(srcPath, targetPath)
 
-	return { targetPath }
+	return { success, targetPath }
 }

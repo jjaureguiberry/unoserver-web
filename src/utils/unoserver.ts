@@ -14,7 +14,7 @@ export class Unoserver {
 
 	constructor({
 		maxWorkers,
-		timeout = 60000,
+		timeout = 120000,
 		port = 12345,
 	}: {
 		maxWorkers: number
@@ -49,7 +49,7 @@ export class Unoserver {
 	 * @param from source file
 	 * @param to target file
 	 */
-	convert(from: string, to: string): Promise<void> {
+	convert(from: string, to: string): Promise<any> {
 		return this.queue.add(() =>
 			pRetry(
 				async () => {
@@ -57,11 +57,19 @@ export class Unoserver {
 						await this.runServer()
 					}
 
-					await execa('unoconvert', ['--port', String(this.port), from, to], {
-						timeout: this.timeout,
-					})
+					try {
+						await execa('unoconvert', ['--port', String(this.port), from, to], {
+							timeout: this.timeout,
+						})
+					} catch (error:any) {
+						if (error.timedOut) {
+							this.stopServer()
+						}
+						return false
+					}
+					return true
 				},
-				{ retries: 3 },
+				{ retries: 0 },
 			),
 		)
 	}

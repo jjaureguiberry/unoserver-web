@@ -51,7 +51,12 @@ export const routes: FastifyPluginCallback = (app, options, next) => {
 				})
 			})
 
-			const { targetPath } = await convertFile(srcPath, req.params.format)
+			const { success, targetPath } = await convertFile(srcPath, req.params.format)
+			if (!success) {
+				res.code(408)
+				res.send()
+				return res
+			}
 
 			const stream = createReadStream(targetPath)
 
