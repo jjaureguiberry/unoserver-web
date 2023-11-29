@@ -11,8 +11,12 @@ import mime from 'mime-types'
 
 import { convertFile } from './utils/convertFile.js'
 import { upload } from './utils/upload.js'
+import { unoserver } from './utils/unoserver.js'
 
 export const routes: FastifyPluginCallback = (app, options, next) => {
+	app.get('/reset', async (req, res) => {
+		unoserver.stopServer()
+	}),
 	app.post<{ Params: { format: string } }>(
 		'/convert/:format',
 		{
